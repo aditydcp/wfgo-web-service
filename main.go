@@ -35,6 +35,7 @@ var farms = []farm{
 func main() {
 	router := gin.Default()
 	router.GET("/farms", getFarms)
+	router.GET("/farms/:id", getFarmByID)
 	router.POST("/farms", addFarm)
 
 	router.Run("localhost:8080")
@@ -60,4 +61,18 @@ func addFarm(c *gin.Context) {
 	// Add to the slice.
 	farms = append(farms, newFarm)
 	c.IndentedJSON(http.StatusCreated, newFarm)
+}
+
+// get farm data by id
+func getFarmByID(c *gin.Context) {
+	id := c.Param("id")
+
+	// Look for farm with given ID
+	for _, a := range farms {
+		if a.ID == id {
+			c.IndentedJSON(http.StatusOK, a)
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "farm not found"})
 }
