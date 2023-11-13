@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,6 +34,14 @@ var farms = []farm{
 
 func main() {
 	router := gin.Default()
+	router.GET("/farm", getFarms)
 
 	router.Run("localhost:8080")
+}
+
+// # REGION START - Handler
+
+// get all farms data
+func getFarms(c *gin.Context) {
+	c.IndentedJSON(http.StatusOK, farms)
 }
