@@ -34,7 +34,8 @@ var farms = []farm{
 
 func main() {
 	router := gin.Default()
-	router.GET("/farm", getFarms)
+	router.GET("/farms", getFarms)
+	router.POST("/farms", addFarm)
 
 	router.Run("localhost:8080")
 }
@@ -44,4 +45,19 @@ func main() {
 // get all farms data
 func getFarms(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, farms)
+}
+
+// add new farm data
+func addFarm(c *gin.Context) {
+	var newFarm farm
+
+	// Call BindJSON to bind the received JSON to
+	// newFarm.
+	if err := c.BindJSON(&newFarm); err != nil {
+		return
+	}
+
+	// Add to the slice.
+	farms = append(farms, newFarm)
+	c.IndentedJSON(http.StatusCreated, newFarm)
 }
