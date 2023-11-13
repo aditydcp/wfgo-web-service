@@ -1,78 +1,30 @@
 package main
 
 import (
-	"net/http"
+	"aditydcp/wfgo-web-service/controllers"
+	config "aditydcp/wfgo-web-service/db"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
 )
 
-// pond represents data about a pond
-type pond struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
-// farm represents data about a farm
-type farm struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	// Ponds []pond  `json:"ponds"`
-}
-
-// placeholder dummy data
-var ponds = []pond{
-	{ID: "1", Name: "A"},
-	{ID: "2", Name: "B"},
-	{ID: "3", Name: "C"},
-	{ID: "4", Name: "ABZ"},
-}
-
-var farms = []farm{
-	{ID: "1", Name: "Blue Train"},
-	{ID: "2", Name: "Jeru"},
-}
-
 func main() {
+	db := config.DBInit()
+	inDB := &controllers.InDB{DB: db}
+
 	router := gin.Default()
-	router.GET("/farms", getFarms)
-	router.GET("/farms/:id", getFarmByID)
-	router.POST("/farms", addFarm)
 
-	router.Run("localhost:8080")
-}
+	router.GET("/farm/:id", inDB.GetFarmById)
+	router.GET("/farms", inDB.GetAllFarms)
+	router.POST("/farm", inDB.CreateFarm)
+	router.PUT("/farm", inDB.UpdateFarm)
+	router.DELETE("/farm/:id", inDB.DeleteFarm)
 
-// # REGION START - Handler
+	router.GET("/pond/:id", inDB.GetPondById)
+	router.GET("/ponds", inDB.GetAllPonds)
+	router.POST("/pond", inDB.CreatePond)
+	router.PUT("/pond", inDB.UpdatePond)
+	router.DELETE("/pond/:id", inDB.DeletePond)
 
-// get all farms data
-func getFarms(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, farms)
-}
-
-// add new farm data
-func addFarm(c *gin.Context) {
-	var newFarm farm
-
-	// Call BindJSON to bind the received JSON to
-	// newFarm.
-	if err := c.BindJSON(&newFarm); err != nil {
-		return
-	}
-
-	// Add to the slice.
-	farms = append(farms, newFarm)
-	c.IndentedJSON(http.StatusCreated, newFarm)
-}
-
-// get farm data by id
-func getFarmByID(c *gin.Context) {
-	id := c.Param("id")
-
-	// Look for farm with given ID
-	for _, a := range farms {
-		if a.ID == id {
-			c.IndentedJSON(http.StatusOK, a)
-			return
-		}
-	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "farm not found"})
+	router.Run(":3000")
 }
