@@ -1,78 +1,48 @@
 package main
 
 import (
-	"net/http"
+	"aditydcp/wfgo-web-service/controllers"
+	"aditydcp/wfgo-web-service/db"
+	"fmt"
+	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
-// pond represents data about a pond
-type pond struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
-// farm represents data about a farm
-type farm struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	// Ponds []pond  `json:"ponds"`
-}
-
-// placeholder dummy data
-var ponds = []pond{
-	{ID: "1", Name: "A"},
-	{ID: "2", Name: "B"},
-	{ID: "3", Name: "C"},
-	{ID: "4", Name: "ABZ"},
-}
-
-var farms = []farm{
-	{ID: "1", Name: "Blue Train"},
-	{ID: "2", Name: "Jeru"},
-}
-
 func main() {
+	// load environment variables
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found")
+	}
+	serverPort := os.Getenv("SERVER_PORT")
+	if serverPort == "" {
+		log.Fatal("You must set your 'SERVER_PORT' environment variable.")
+	}
+	db.ConnectDb()
 	router := gin.Default()
-	router.GET("/farms", getFarms)
-	router.GET("/farms/:id", getFarmByID)
-	router.POST("/farms", addFarm)
 
-	router.Run("localhost:8080")
-}
+	// router.GET("/movies", routes.GetMovies)
 
-// # REGION START - Handler
+	router.POST("/farm", controllers.CreateFarm)
+	router.GET("/farms", controllers.GetFarms)
+	router.GET("/farm/:id", controllers.GetFarmById)
+	router.PUT("/farm/:id", controllers.UpdateFarm)
+	router.DELETE("/farm/:id", controllers.DeleteFarm)
 
-// get all farms data
-func getFarms(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, farms)
-}
+	router.POST("/pond", controllers.CreatePond)
+	router.GET("/ponds", controllers.GetPonds)
+	router.GET("/pond/:id", controllers.GetPondById)
+	router.PUT("/pond/:id", controllers.UpdatePond)
+	router.DELETE("/pond/:id", controllers.DeletePond)
 
-// add new farm data
-func addFarm(c *gin.Context) {
-	var newFarm farm
+	router.GET("/recycled/farms", controllers.GetRecycledFarms)
+	router.GET("/recycled/ponds", controllers.GetRecycledPonds)
 
-	// Call BindJSON to bind the received JSON to
-	// newFarm.
-	if err := c.BindJSON(&newFarm); err != nil {
-		return
-	}
+	router.GET("/statistics", controllers.GetStats)
 
-	// Add to the slice.
-	farms = append(farms, newFarm)
-	c.IndentedJSON(http.StatusCreated, newFarm)
-}
+	defer db.DisconnectDb()
 
-// get farm data by id
-func getFarmByID(c *gin.Context) {
-	id := c.Param("id")
-
-	// Look for farm with given ID
-	for _, a := range farms {
-		if a.ID == id {
-			c.IndentedJSON(http.StatusOK, a)
-			return
-		}
-	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "farm not found"})
+	router.Run(fmt.Sprintf(":%s", serverPort))
 }
