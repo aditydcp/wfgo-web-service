@@ -33,3 +33,8 @@ Get a list of all existing pond.
 
 ### GET (ID) - /:id
 Get info about a pond with specified id.
+
+## /statistics
+
+### GET - /
+Get info of each endpoints call count.

@@ -14,6 +14,7 @@ import (
 
 // GET all farms
 func GetFarms(c *gin.Context) {
+	AddStats("GET /farms", c.ClientIP())
 	// find all entries
 	var coll = db.Db.Collection("farms")
 	cursor, err := coll.Find(context.TODO(), bson.D{})
@@ -34,6 +35,7 @@ func GetFarms(c *gin.Context) {
 
 // GET farm by id
 func GetFarmById(c *gin.Context) {
+	AddStats("GET /farm/:id", c.ClientIP())
 	id := c.Param("id")
 	if id == "" {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "No ID given in path"})
@@ -56,6 +58,7 @@ func GetFarmById(c *gin.Context) {
 
 // POST create farm
 func CreateFarm(c *gin.Context) {
+	AddStats("POST /pond", c.ClientIP())
 	// bind request body into Farm model
 	var coll = db.Db.Collection("farms")
 	var newFarm models.Farm
@@ -105,6 +108,7 @@ func CreateFarm(c *gin.Context) {
 
 // PUT edit farm
 func UpdateFarm(c *gin.Context) {
+	AddStats("PUT /farm/:id", c.ClientIP())
 	id := c.Param("id")
 	if id == "" {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "No ID given in path"})
