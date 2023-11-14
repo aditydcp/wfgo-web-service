@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"aditydcp/wfgo-web-service/db"
 )
 
 func GetMovies(c *gin.Context) {
@@ -17,7 +18,7 @@ func GetMovies(c *gin.Context) {
 	// 	result gin.H
 	// )
 
-	coll := Client.Database("sample_mflix").Collection("movies")
+	coll := db.Client.Database("sample_mflix").Collection("movies")
 	title := "Back to the Future"
 	var result bson.M
 	var err error

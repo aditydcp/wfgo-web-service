@@ -10,7 +10,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func ConnectDb() *mongo.Client {
+var Client *mongo.Client
+
+func ConnectDb() {
 	// load environment variables
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
@@ -26,11 +28,11 @@ func ConnectDb() *mongo.Client {
 		panic(err)
 	}
 
-	return client
+	Client = client
 }
 
-func DisconnectDb(client *mongo.Client) {
-	if err := client.Disconnect(context.TODO()); err != nil {
+func DisconnectDb() {
+	if err := Client.Disconnect(context.TODO()); err != nil {
 		panic(err)
 	}
 }
