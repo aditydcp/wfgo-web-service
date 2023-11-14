@@ -14,6 +14,7 @@ import (
 
 // DELETE farm by id
 func DeleteFarm(c *gin.Context) {
+	AddStats("DELETE /farm/:id", c.ClientIP())
 	var coll = db.Db.Collection("farms")
 	id := c.Param("id")
 	if id == "" {
@@ -50,6 +51,7 @@ func DeleteFarm(c *gin.Context) {
 
 // DELETE pond by id
 func DeletePond(c *gin.Context) {
+	AddStats("DELETE /pond/:id", c.ClientIP())
 	var coll = db.Db.Collection("ponds")
 	id := c.Param("id")
 	if id == "" {
@@ -86,6 +88,7 @@ func DeletePond(c *gin.Context) {
 
 // GET all recycled farms
 func GetRecycledFarms(c *gin.Context) {
+	AddStats("GET /recycled/farms", c.ClientIP())
 	// find all entries
 	var coll = db.Db.Collection("deleted_farms")
 	cursor, err := coll.Find(context.TODO(), bson.D{})
@@ -106,6 +109,7 @@ func GetRecycledFarms(c *gin.Context) {
 
 // GET all recycled ponds
 func GetRecycledPonds(c *gin.Context) {
+	AddStats("GET /recycled/ponds", c.ClientIP())
 	// find all entries
 	var coll = db.Db.Collection("deleted_ponds")
 	cursor, err := coll.Find(context.TODO(), bson.D{})

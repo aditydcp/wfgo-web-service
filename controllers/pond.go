@@ -91,6 +91,7 @@ func CreatePond(c *gin.Context) {
 
 // PUT edit pond
 func UpdatePond(c *gin.Context) {
+	AddStats("PUT /pond/:id", c.ClientIP())
 	id := c.Param("id")
 	if id == "" {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "No ID given in path"})
