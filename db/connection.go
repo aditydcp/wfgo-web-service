@@ -11,6 +11,7 @@ import (
 )
 
 var Client *mongo.Client
+var Db *mongo.Database
 
 func ConnectDb() {
 	// load environment variables
@@ -29,6 +30,7 @@ func ConnectDb() {
 	}
 
 	Client = client
+	Db = client.Database("aquafarm")
 }
 
 func DisconnectDb() {
